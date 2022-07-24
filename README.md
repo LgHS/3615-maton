@@ -11,3 +11,7 @@ Thanks to:
 * Pankaj
 * Neodyme
 * Tecknoplay
+
+
+Sources:
+https://wiki.labomedia.org/index.php/Minitel_0.2.html#Solution_avec_Python_.2B_OpenCV
