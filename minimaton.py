@@ -10,6 +10,6 @@ dim = (80,60) #*60 to keep aspect ratio and maybe add some text
 img_resized = cv2.resize(img, dim)
 print('Resized: ', img_resized.shape)
 
-cv2.imwrite(filename='camera.jpg', img=img)
-cv2.imwrite(filename='camera_resized.jpg', img=img_resized)
+cv2.imwrite(filename='images/camera.jpg', img=img)
+cv2.imwrite(filename='images/camera_resized.jpg', img=img_resized)
 webcam.release()
