@@ -1,5 +1,6 @@
 
 import cv2
+import numpy as np
 import serial
 import time
 
@@ -65,10 +66,34 @@ def to_vdt(ret, frame):
     num_pixel = 0
     img_01 = ""
     print('looping each line')
+
+    height = frame.shape[0]
+    width = frame.shape[1]
+
+    #loop on each pixel
+    for y in range(0, height):
+        i = 0
+        for x in range(0, width):
+            if(x<width-2 and y<height-3):
+                #create pixel matrix
+                pxl_mat = [
+                        img_bw[y,x],
+                        img_bw[y,x+1],
+                        img_bw[y+1,x],
+                        img_bw[y+2,x],
+                        img_bw[y+3,x],
+                        img_bw[y,x+2]
+                    ]
+                #get matrix's avg greyscale
+                pxl_avg = np.average(pxl_mat)
+                print(round(pxl_avg))
+
+
     # loop for each line
     for line in range(31):
         for pixel in range(71):
-            pxl_lvl = img_bitmap[line][pixel]
+            pxl_lvl = img_bw[line][pixel]
+            #print(img_bw[line][pixel])
 
             if(pxl_lvl == 255): # if pixel is black, store as 1
                 byte += "1"
@@ -81,6 +106,7 @@ def to_vdt(ret, frame):
             if (num_pixel%8 ==0):
                 tab_byte.append(int(byte,2))
                 byte = ""
+
     print('displaying image')
     display_vdt(img_01)
 #####
