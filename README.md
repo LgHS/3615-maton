@@ -1,6 +1,6 @@
-# Minitel-maton
+# 3615 Maton
 
-Inspired by our AsciiMaton, here is the Minitel-maton.
+Inspired by our AsciiMaton, here is the 3615 Maton.
 
 Take a picture, display it on a Minitel (model 1B here) and print it on a good old dot matrix printer (Epson LX-800)!
 
@@ -12,7 +12,7 @@ Using a 5v USB-TTL converter, connect it to the minitel following this:
 https://pila.fr/wordpress/?p=361 (source in french)
 
 ## Usage:
-Power-up the Raspberry Pi and the printer, run `minimaton.py` and enjoy!
+Power-up the Raspberry Pi and the printer, run `3615maton.py` and enjoy!
 
 Communication being done via a serial-to-usb converter, weird stuff and interferences can happen. Try to reboot the pi, plug/unplug the adapter etc. Be sure to have everything "ready" before trying to print (don't connect the printer after running the script, for example).
 
