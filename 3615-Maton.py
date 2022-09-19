@@ -30,17 +30,16 @@ minitel.curseur(False)
 
 print_width = 320
 print_height = int((240/320)*print_width)
-printer = open('/dev/usb/lp0', "wb")
 w_fs = "y" # With or without FS?
 textfooter = b"2022 - Kikk Festival - Minitel-maton by LgHS!"
-
+ 
 def splashscreen():
 
     minitel.efface("vraimenttout")
-    image = Image.open('images/logo_mini.jpg')
+    image = Image.open('resources/logo_mini.jpg')
     image_minitel = ImageMinitel(minitel)
     image_minitel.importer(image)
-    image_minitel.envoyer(14,2)
+    image_minitel.envoyer(11,2)
 
     minitel.position(9,14)
     minitel.taille(largeur = 2, hauteur = 2)
@@ -51,11 +50,12 @@ def splashscreen():
     minitel.position(17, 17)
     minitel.envoyer('By LgHS')
 
-    minitel.position(5,21)
+    minitel.position(6,21)
     minitel.envoyer('Press space to take a picture!')
 
     # Ready, wait for serial input...
     if(minitel.recevoir(True, None) == " "):
+        print("Space pressed")
         return countdown()
 
 def countdown():
@@ -196,11 +196,14 @@ def dither_ready(img):
     minitel.envoyer('1 - New | 2 - Print | 3 - Home')
     
     if(minitel.recevoir(True, None) == "1"):
-        countdown()
+        print("1 pressed")
+        return countdown()
     if(minitel.recevoir(True, None) == "2"):
-        to_printer(img)
+        print("2 pressed")
+        return to_printer(img)
     if(minitel.recevoir(True, None) == "3"):
-        splashscreen()
+        print("3 pressed")
+        return splashscreen()
 
 def to_printer(img):
     print("printing...")
@@ -208,7 +211,7 @@ def to_printer(img):
     minitel.envoyer('Printing, please wait...               ')
     
     try:
-        with printer:
+        with  open('/dev/usb/lp0', "wb") as printer:
             try:
                 printer.write(bytearray(b"\x1b\x40")) ## ESC @ // initialise printer
 
@@ -250,7 +253,7 @@ def to_printer(img):
                 printer.write(bytearray(textfooter))
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
-                for i in range (0,21):
+                for i in range (0,25):
                     printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
             except OSError as e:
@@ -267,7 +270,7 @@ def to_printer(img):
     print("Ready")
     time.sleep(10)   ## Needed time to print rest of the image
 
-    splashscreen()
+    return splashscreen()
 
 def share():
     return True
