@@ -253,7 +253,7 @@ def to_printer(img):
                 printer.write(bytearray(textfooter))
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
-                for i in range (0,25):
+                for i in range (0,30):
                     printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
             except OSError as e:
