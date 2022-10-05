@@ -13,6 +13,7 @@ from PIL import Image
 from time import sleep
 import signal
 import sys
+import requests
 
 
 ## Minitel config
@@ -94,11 +95,13 @@ def snap():
     dim = (80,60) #*60 to keep aspect ratio and maybe add some text
     img_small = cv2.resize(img, dim)
 
-    cv2.imwrite(filename='images/'+img_name+'.jpg', img=img) # Original
+    imagePath = 'images/' + img_name + '.jpg'
+    cv2.imwrite(filename=imagePath, img=img) # Original
 
     webcam.release()
     
     display_snap(img_small) # Start to display image while dithering is processed
+    upload(imagePath)
 
     if (w_fs == "y"):
         img = fs_dither(img)
@@ -274,6 +277,16 @@ def to_printer(img):
 
 def share():
     return True
+
+def upload(imagePath):
+    try:
+        url = 'https://kikk.lghs.space/api/minitel'
+        files = {'file': open(imagePath, 'rb')}
+        headers = {'Authorization': 'Bearer ' + str(os.environ['LGHS_KIKK_BEARER'])}
+        r = requests.put(url, files=files, headers=headers, verify=False)
+        print("Image upload : " + str(r.status_code))
+    except:
+        print("Error while uploading photo")
 
 splashscreen()
 
