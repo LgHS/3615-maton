@@ -101,7 +101,6 @@ def snap():
     webcam.release()
     
     display_snap(img_small) # Start to display image while dithering is processed
-    upload(imagePath)
 
     if (w_fs == "y"):
         img = fs_dither(img)
@@ -113,7 +112,7 @@ def snap():
 
     cv2.imwrite(filename='images/'+img_name+'_dth.jpg', img=img)
 
-    return dither_ready(img)
+    return dither_ready(img, imagePath)
 
 ###
 # Append footer
@@ -193,10 +192,10 @@ def display_snap(img):
     minitel.position(34,24)
     minitel.envoyer('By LgHS')
 
-def dither_ready(img):
+def dither_ready(img, imagePath):
     print('Dithering ready')
     minitel.position(4,22)
-    minitel.envoyer('1 - New | 2 - Print | 3 - Home')
+    minitel.envoyer('1 - New | 2 - Print | 3 - Share')
     
     if(minitel.recevoir(True, None) == "1"):
         print("1 pressed")
@@ -206,7 +205,7 @@ def dither_ready(img):
         return to_printer(img)
     if(minitel.recevoir(True, None) == "3"):
         print("3 pressed")
-        return splashscreen()
+        return upload(imagePath)
 
 def to_printer(img):
     print("printing...")
@@ -278,6 +277,9 @@ def to_printer(img):
 def share():
     return True
 
+###
+## Upload picture to backend
+###
 def upload(imagePath):
     try:
         url = 'https://kikk.lghs.space/api/minitel'
