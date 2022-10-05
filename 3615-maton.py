@@ -206,6 +206,9 @@ def dither_ready(img, imagePath):
     if(minitel.recevoir(True, None) == "3"):
         print("3 pressed")
         return upload(imagePath)
+    if(minitel.recevoir(True, None) == " "):
+        print("Space pressed")
+        return splashscreen()
 
 def to_printer(img):
     print("printing...")
@@ -282,8 +285,11 @@ def share():
 ###
 def upload(imagePath):
     try:
+        print("Sharing to api")
+        print(imagePath)
         url = 'https://kikk.lghs.space/api/minitel'
         files = {'file': open(imagePath, 'rb')}
+        print(str(os.environ['LGHS_KIKK_BEARER']))
         headers = {'Authorization': 'Bearer ' + str(os.environ['LGHS_KIKK_BEARER'])}
         r = requests.put(url, files=files, headers=headers, verify=False)
         print("Image upload : " + str(r.status_code))
