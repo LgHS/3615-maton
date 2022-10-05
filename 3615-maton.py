@@ -18,7 +18,7 @@ import sys
 ## Minitel config
 minitel = Minitel()
 
-minitel.deviner_vitesse()
+minitel.deviner_vitesse()   
 minitel.identifier()
 minitel.definir_vitesse(4800)
 minitel.definir_mode('VIDEOTEX')
@@ -31,7 +31,7 @@ minitel.curseur(False)
 print_width = 320
 print_height = int((240/320)*print_width)
 w_fs = "y" # With or without FS?
-textfooter = b"2022 - Kikk Festival - Minitel-maton by LgHS!"
+textfooter = b"2022 - 54 Derivation - 3615-maton by LgHS!"
  
 def splashscreen():
 
