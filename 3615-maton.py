@@ -32,8 +32,9 @@ minitel.curseur(False)
 print_width = 320
 print_height = int((240/320)*print_width)
 w_fs = "y" # With or without FS?
-textfooter = b"2022 - 54 Derivation - 3615-maton by LgHS!"
- 
+textfooter1 = b"2022 - 54 Derivation - 3615-maton by LgHS! \r\n"
+textfooter2 = b"github.com/LgHS - lghs.be"
+
 def splashscreen():
 
     minitel.efface("vraimenttout")
@@ -232,7 +233,7 @@ def to_printer(img):
                 printer.write(bytearray(b"\x1b\x50")) ## ESC P // 10CPI
                 printer.write(bytearray(b"\x1b\x6c\x12")) ## ESC l 10 // 1 inch left margin
 
-                for i in range (0,22):
+                for i in range (0,20):
                     printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
                 for y in range(0, img_h-8, 8):
@@ -255,10 +256,11 @@ def to_printer(img):
                         printer.write(b.to_bytes(1, 'little'))
 
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
-                printer.write(bytearray(textfooter))
+                printer.write(bytearray(textfooter1))
+                printer.write(bytearray(textfooter2))
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
-                for i in range (0,30):
+                for i in range (0,35):
                     printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
             except OSError as e:
