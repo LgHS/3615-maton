@@ -23,6 +23,7 @@ Black and white dithering is a bit slow (takes up to 15sec to dither) on Pi3
 # Requirements:
 
 `PyMinitel` https://github.com/Zigazou/PyMinitel 
+
 `python-decouple` pip install python-decouple
 
 ## Thanks to:
