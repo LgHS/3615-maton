@@ -15,6 +15,11 @@ import signal
 import sys
 import requests
 
+from decouple import config
+
+LGHS_KIKK_BEARER = config('LGHS_KIKK_BEARER')
+TXT_FOOTER_1 = config('TXT_FOOTER_1')
+TXT_FOOTER_2 = config('TXT_FOOTER_2')
 
 ## Minitel config
 minitel = Minitel()
@@ -36,7 +41,7 @@ textfooter1 = b"2022 - 54 Derivation - 3615-maton by LgHS! \r\n"
 textfooter2 = b"github.com/LgHS - lghs.be"
 
 def splashscreen():
-
+    print("Starting script...")
     minitel.efface("vraimenttout")
     image = Image.open('resources/logo_mini.jpg')
     image_minitel = ImageMinitel(minitel)
@@ -59,6 +64,8 @@ def splashscreen():
     if(minitel.recevoir(True, None) == " "):
         print("Space pressed")
         return countdown()
+    else:
+        return splashscreen()
 
 def countdown():
     # Create countdown here
@@ -193,23 +200,36 @@ def display_snap(img):
     minitel.position(34,24)
     minitel.envoyer('By LgHS')
 
-def dither_ready(img, imagePath):
+def dither_ready(img, imagePath, flag = ""):
     print('Dithering ready')
     minitel.position(4,22)
-    minitel.envoyer('1 - New | 2 - Print | 3 - Share')
-    
-    if(minitel.recevoir(True, None) == "1"):
-        print("1 pressed")
-        return countdown()
-    if(minitel.recevoir(True, None) == "2"):
-        print("2 pressed")
-        return to_printer(img)
-    if(minitel.recevoir(True, None) == "3"):
-        print("3 pressed")
-        return upload(imagePath)
-    if(minitel.recevoir(True, None) == " "):
-        print("Space pressed")
-        return splashscreen()
+
+    # If nothing was raised, apply default options
+
+
+    if (flag == ""): 
+        minitel.envoyer('1 - New | 2 - Print | 3 - Share     ')
+        keyPress = minitel.recevoir(True, None)
+        if(keyPress == "1"):
+            print("1 pressed")
+            return countdown()
+        if(keyPress == "2"):
+            print("2 pressed")
+            return to_printer(img)
+        if(keyPress == "3"):
+            print("3 pressed")
+            upload(imagePath)
+            dither_ready(img, imagePath, "shared")
+        if(keyPress == "A"):
+            return splashscreen()
+   
+    # Shared was done, only allow user to print o retry
+    if (flag == "shared"):
+        minitel.envoyer('Shared! Press space to print!      ')
+        keyPress = minitel.recevoir(True, None)
+        if(keyPress  == " "):
+            print("Space pressed")
+            return to_printer(img)
 
 def to_printer(img):
     print("printing...")
@@ -256,8 +276,8 @@ def to_printer(img):
                         printer.write(b.to_bytes(1, 'little'))
 
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
-                printer.write(bytearray(textfooter1))
-                printer.write(bytearray(textfooter2))
+                printer.write(bytearray("\n\r"+TXT_FOOTER_1+"\n\r", encoding='utf8'))
+                printer.write(bytearray(TXT_FOOTER_2, encoding='utf8'))
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
                 for i in range (0,35):
@@ -275,7 +295,10 @@ def to_printer(img):
     printer.close()
 
     print("Ready")
-    time.sleep(10)   ## Needed time to print rest of the image
+    time.sleep(15)   ## Needed time to print rest of the image
+
+    minitel.envoyer('Printing done! Have a nice day!           ')
+    minitel.bip()
 
     return splashscreen()
 
@@ -291,12 +314,15 @@ def upload(imagePath):
         print(imagePath)
         url = 'https://kikk.lghs.space/api/minitel'
         files = {'file': open(imagePath, 'rb')}
-        print(str(os.environ['LGHS_KIKK_BEARER']))
-        headers = {'Authorization': 'Bearer ' + str(os.environ['LGHS_KIKK_BEARER'])}
-        r = requests.put(url, files=files, headers=headers, verify=False)
+        print(str(LGHS_KIKK_BEARER))
+        headers = {'Authorization': 'Bearer ' + LGHS_KIKK_BEARER}
+        r = requests.put(url, files=files, headers=headers)
         print("Image upload : " + str(r.status_code))
     except:
         print("Error while uploading photo")
+
+
+    return True
 
 splashscreen()
 

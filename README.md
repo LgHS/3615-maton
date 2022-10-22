@@ -12,7 +12,7 @@ Using a 5v USB-TTL converter, connect it to the minitel following this:
 https://pila.fr/wordpress/?p=361 (source in french)
 
 ## Usage:
-Power-up the Raspberry Pi and the printer, run `3615maton.py` and enjoy!
+Power-up the Raspberry Pi and the printer, run `3615-maton.py` and enjoy!
 
 Communication being done via a serial-to-usb converter, weird stuff and interferences can happen. Try to reboot the pi, plug/unplug the adapter etc. Be sure to have everything "ready" before trying to print (don't connect the printer after running the script, for example).
 
@@ -20,6 +20,10 @@ Written in python3 for Raspberry Pi 3.
 
 Black and white dithering is a bit slow (takes up to 15sec to dither) on Pi3
 
+# Requirements:
+
+`PyMinitel` https://github.com/Zigazou/PyMinitel 
+`python-decouple` pip install python-decouple
 
 ## Thanks to:
 * Pankaj
