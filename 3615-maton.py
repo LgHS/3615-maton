@@ -208,19 +208,20 @@ def dither_ready(img, imagePath, flag = ""):
 
 
     if (flag == ""): 
-        minitel.envoyer('1 - New | 2 - Print | 3 - Share     ')
+        minitel.envoyer('1 - New | 2 - Print | 3 - Draw     ')
         keyPress = minitel.recevoir(True, None)
         if(keyPress == "1"):
             print("1 pressed")
             return countdown()
         if(keyPress == "2"):
             print("2 pressed")
-            return to_printer(img)
+            return to_printer(img, imagePath)
         if(keyPress == "3"):
             print("3 pressed")
-            upload(imagePath)
-            dither_ready(img, imagePath, "shared")
-        if(keyPress == "A"):
+            #upload(imagePath)
+            #dither_ready(img, imagePath, "shared")
+            return;
+        if(keyPress == "a"):
             return splashscreen()
    
     # Shared was done, only allow user to print o retry
@@ -231,7 +232,9 @@ def dither_ready(img, imagePath, flag = ""):
             print("Space pressed")
             return to_printer(img)
 
-def to_printer(img):
+def to_printer(img, imagePath):
+    print("Sending to Frol")
+    upload(imagePath)
     print("printing...")
     minitel.position(4,22)
     minitel.envoyer('Printing, please wait...               ')
@@ -280,7 +283,7 @@ def to_printer(img):
                 printer.write(bytearray(TXT_FOOTER_2, encoding='utf8'))
                 printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
-                for i in range (0,35):
+                for i in range (0,53):
                     printer.write(bytearray(b"\x0a\x0d")) ## \n\r
 
             except OSError as e:
@@ -312,7 +315,7 @@ def upload(imagePath):
     try:
         print("Sharing to api")
         print(imagePath)
-        url = 'https://kikk.lghs.space/api/minitel'
+        url = 'https://kikk.lghs.be/api/minitel'
         files = {'file': open(imagePath, 'rb')}
         print(str(LGHS_KIKK_BEARER))
         headers = {'Authorization': 'Bearer ' + LGHS_KIKK_BEARER}
