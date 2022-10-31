@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+from urllib import response
 import cv2
 import numpy as np
 import time
+import qrcode
+import json
 from datetime import datetime
 
 from minitel.Minitel import Minitel
@@ -19,6 +22,7 @@ from decouple import config
 
 API_BEARER = config('API_BEARER')
 API_URL = config('API_URL')
+FRONT_URL = config('FRONT_URL')
 TXT_FOOTER_1 = config('TXT_FOOTER_1')
 TXT_FOOTER_2 = config('TXT_FOOTER_2')
 
@@ -209,39 +213,32 @@ def dither_ready(img, imagePath, flag = ""):
     # If nothing was raised, apply default options
 
     if (flag == ""): 
+        minitel.position(4,22)
         minitel.efface('ligne')
-        minitel.envoyer('Press space to print')
-        minitel.position(5, 23)
-        minitel.envoyer('Or N to retry')
+        minitel.envoyer('Press space to print or N to retry')
         
         keyPress = minitel.recevoir(True, None)
-        if(keyPress == "N"):
+        if(keyPress == "n"):
             print("N pressed")
             return countdown()
         if(keyPress == " "):
             print("Space pressed")
-            return to_printer(img)
+            #upload(imagePath)
+            return to_printer(img, imagePath)
         if(keyPress == "3"):
             print("3 pressed")
             #upload(imagePath)
             #dither_ready(img, imagePath, "shared")
         if(keyPress == "A"):
             return splashscreen()
-   
-    # Shared was done, only allow user to print o retry
-    if (flag == "shared"):
-        minitel.efface('ligne')
-        minitel.envoyer('Shared! Press space to print!')
-        keyPress = minitel.recevoir(True, None)
-        if(keyPress  == " "):
-            print("Space pressed")
-            return to_printer(img)
 
-def to_printer(img):
+def to_printer(img, imagePath):
     print("printing...")
-    minitel.position(4,22)
+    minitel.position(4,1)
     minitel.efface('ligne')
     minitel.envoyer('Printing, please wait...')
+    minitel.position(5,1)
+    minitel.efface('ligne')
     
     try:
         with  open('/dev/usb/lp0', "wb") as printer:
@@ -303,34 +300,70 @@ def to_printer(img):
     printer.close()
 
     print("Ready")
-    time.sleep(17)   ## Needed time to print rest of the image
+    #time.sleep(17)   ## Needed time to print rest of the image
     
-    minitel.efface('ligne')
-    minitel.envoyer('Printing done! Have a nice day!')
-    minitel.bip()
+    #minitel.efface('ligne')
+    #minitel.envoyer('Printing done! Have a nice day!')
+    #minitel.bip()
+    upload(imagePath)
 
     return splashscreen()
 
-def share():
-    return True
+def share(response):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=2,
+        border=2,
+    )
+    qr.add_data(response)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="white", back_color=(0,0,1))
+    print(img.size)
+
+    minitel.efface('vraimenttout')
+    image_minitel = ImageMinitel(minitel)
+    image_minitel.importer(img)
+    image_minitel.envoyer(5, 1)
+
+    minitel.position(8,23)
+    minitel.efface('ligne')
+    minitel.taille(largeur = 2, hauteur = 2)
+    minitel.envoyer('Scan & share!')
+
+    print('displaying qcode')
+
+    keyPress = minitel.recevoir(True, None)
+    if(keyPress == " "):
+        return splashscreen()
 
 ###
 ## Upload picture to backend
 ###
 def upload(imagePath):
+    print(imagePath)
     try:
         print("Sharing to api")
         files = {'file': open(imagePath, 'rb')}
         headers = {'Authorization': 'Bearer ' + API_BEARER}
         r = requests.put(API_URL, files=files, headers=headers)
-        print("Image upload : " + str(r.status_code))
+
     except:
         print("Error while uploading photo")
 
+    jsonresponse = r.json()
+    url = FRONT_URL + "/" + jsonresponse['uuid'][:7]
+    share(url)
 
     return True
 
+
+
 splashscreen()
+#share()
+
+
 
 minitel.sortie.join()
 minitel.close()
