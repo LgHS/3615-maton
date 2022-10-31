@@ -17,7 +17,8 @@ import requests
 
 from decouple import config
 
-LGHS_KIKK_BEARER = config('LGHS_KIKK_BEARER')
+API_BEARER = config('API_BEARER')
+API_URL = config('API_URL')
 TXT_FOOTER_1 = config('TXT_FOOTER_1')
 TXT_FOOTER_2 = config('TXT_FOOTER_2')
 
@@ -196,36 +197,41 @@ def display_snap(img):
 
     minitel.sortie.join()
     minitel.position(4,22)
-    minitel.envoyer('Processing, please wait...    ')
+    minitel.efface('ligne')
+    minitel.envoyer('Processing, please wait...')
     minitel.position(34,24)
     minitel.envoyer('By LgHS')
 
 def dither_ready(img, imagePath, flag = ""):
     print('Dithering ready')
-    minitel.position(4,22)
+    minitel.position(2,22)
 
     # If nothing was raised, apply default options
 
-
     if (flag == ""): 
-        minitel.envoyer('1 - New | 2 - Print | 3 - Share     ')
+        minitel.efface('ligne')
+        minitel.envoyer('Press space to print')
+        minitel.position(5, 23)
+        minitel.envoyer('Or N to retry')
+        
         keyPress = minitel.recevoir(True, None)
-        if(keyPress == "1"):
-            print("1 pressed")
+        if(keyPress == "N"):
+            print("N pressed")
             return countdown()
-        if(keyPress == "2"):
-            print("2 pressed")
+        if(keyPress == " "):
+            print("Space pressed")
             return to_printer(img)
         if(keyPress == "3"):
             print("3 pressed")
-            upload(imagePath)
-            dither_ready(img, imagePath, "shared")
+            #upload(imagePath)
+            #dither_ready(img, imagePath, "shared")
         if(keyPress == "A"):
             return splashscreen()
    
     # Shared was done, only allow user to print o retry
     if (flag == "shared"):
-        minitel.envoyer('Shared! Press space to print!      ')
+        minitel.efface('ligne')
+        minitel.envoyer('Shared! Press space to print!')
         keyPress = minitel.recevoir(True, None)
         if(keyPress  == " "):
             print("Space pressed")
@@ -234,7 +240,8 @@ def dither_ready(img, imagePath, flag = ""):
 def to_printer(img):
     print("printing...")
     minitel.position(4,22)
-    minitel.envoyer('Printing, please wait...               ')
+    minitel.efface('ligne')
+    minitel.envoyer('Printing, please wait...')
     
     try:
         with  open('/dev/usb/lp0', "wb") as printer:
@@ -286,7 +293,8 @@ def to_printer(img):
             except OSError as e:
                 print('Error when printing')
                 minitel.position(4,22)
-                minitel.envoyer('Error when printing...                               ')
+                minitel.efface('ligne')
+                minitel.envoyer('Error when printing...')
                 print(e)
                 
     except FileNotFoundError as e:
@@ -295,9 +303,10 @@ def to_printer(img):
     printer.close()
 
     print("Ready")
-    time.sleep(15)   ## Needed time to print rest of the image
-
-    minitel.envoyer('Printing done! Have a nice day!           ')
+    time.sleep(17)   ## Needed time to print rest of the image
+    
+    minitel.efface('ligne')
+    minitel.envoyer('Printing done! Have a nice day!')
     minitel.bip()
 
     return splashscreen()
@@ -311,12 +320,9 @@ def share():
 def upload(imagePath):
     try:
         print("Sharing to api")
-        print(imagePath)
-        url = 'https://kikk.lghs.space/api/minitel'
         files = {'file': open(imagePath, 'rb')}
-        print(str(LGHS_KIKK_BEARER))
-        headers = {'Authorization': 'Bearer ' + LGHS_KIKK_BEARER}
-        r = requests.put(url, files=files, headers=headers)
+        headers = {'Authorization': 'Bearer ' + API_BEARER}
+        r = requests.put(API_URL, files=files, headers=headers)
         print("Image upload : " + str(r.status_code))
     except:
         print("Error while uploading photo")
