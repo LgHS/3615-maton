@@ -153,6 +153,13 @@ def img_footer(img):
 # Source: https://gist.github.com/bzamecnik/33e10b13aae34358c16d1b6c69e89b01
 ### 
 def fs_dither(img):
+    img = cv2.resize(img, (print_width, print_height))
+    img = Image.fromarray(img) # from opencv to PIL
+    img = img.convert('1')
+    img = np.array(img) # from PIL to opencv
+    return img
+
+def fs_dither_old(img):
     print("Dithering in process...")
 
     # To BW
